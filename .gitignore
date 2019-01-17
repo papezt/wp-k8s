@@ -1,0 +1,20 @@
+# Ignore Apple FS stuff
+.DS_Store
+
+# Ignore vim temporary stuff
+.*swp
+
+# Ignore ansible retry files
+*.retry
+
+.idea/
+
+# Ignore terraform state and config files
+example.tf
+terraform.tfplan
+terraform.tfstate
+*.backup
+*.tfstate
+.terraform/
+*.log
+.serverless/

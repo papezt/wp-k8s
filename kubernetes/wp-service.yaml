@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: wp
+  name: wp
+  labels:
+    name: wp
+    tier: frontend
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort
+  selector:
+    app: wp

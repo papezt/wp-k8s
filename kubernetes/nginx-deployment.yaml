@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-proxy
+  namespace: wp
+  labels:
+    app: nginx-proxy
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: nginx-proxy
+      tier: proxy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-proxy
+        tier: proxy
+    spec:
+      containers:
+        - image: nginx:1.15.8-alpine
+          name: nginx-proxy
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /pup
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /pup
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 80
+              name: wp
+            - containerPort: 443
+              name: wp-ssl
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: certificate
+              mountPath: "/etc/nginx/cert"
+              readOnly: true
+            - name: proxy-config
+              mountPath: "/etc/nginx/conf.d/"
+              readOnly: true
+      volumes:
+        - name: certificate
+          secret:
+            secretName: wp-papezt-crt
+        - name: proxy-config
+          configMap:
+            name: proxy-config
+            items:
+              - key: default.conf
+                path: "default.conf"

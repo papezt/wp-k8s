@@ -1,0 +1,18 @@
+steps:
+- name: 'gcr.io/${PROJECT_ID}/terraform'
+  args: ['init']
+  env:
+    - "TF_VAR_GOOGLE_PROJECT=${PROJECT_ID}"
+- name: 'gcr.io/${PROJECT_ID}/terraform'
+  args: ['plan']
+  env:
+    - "TF_VAR_GOOGLE_PROJECT=${PROJECT_ID}"
+- name: 'gcr.io/${PROJECT_ID}/terraform'
+  args: ['apply', '-auto-approve']
+  env:
+    - "TF_VAR_GOOGLE_PROJECT=${PROJECT_ID}"
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f',"kubernetes/"]
+  env:
+  - 'CLOUDSDK_CONTAINER_CLUSTER=wordpress-testing'
+  - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-d'
